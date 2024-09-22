@@ -4,7 +4,6 @@ import Ship from '../modules/Ship.js';
 describe('GameBoard class', () => {
 	let gb3;
 	let gb10;
-
 	beforeEach(() => {
 		gb3 = new GameBoard(3);
 		gb10 = new GameBoard(10);
@@ -144,9 +143,38 @@ describe('GameBoard class', () => {
 			expect(gb3.placeShip).toBeDefined();
 		});
 
-		it('receive a ship and places at the board', () => {
+		it('receive a ship and places at the board horizontally, returning fleet coordinates on its ship', () => {
 			const destroyer = new Ship('destroyer', 5);
-			expect(gb10.placeShip(destroyer, [2, 4], 0)).toStrictEqual();
+			expect(gb10.fleet).toBeDefined();
+			expect(gb10.placeShip(destroyer, [1, 1], 0)).toStrictEqual(gb10.fleet);
+			expect(gb10.fleet[0].coordinates).toStrictEqual([
+				[1, 1],
+				[2, 1],
+				[3, 1],
+				[4, 1],
+				[5, 1],
+			]);
+		});
+
+		it('receive a ship and places at the board vertically, returning fleet coordinates on its ship', () => {
+			const carrier = new Ship('carrier', 4);
+			expect(gb10.placeShip(carrier, [3, 6], 1)).toStrictEqual(gb10.fleet);
+			expect(gb10.fleet[0].coordinates).toStrictEqual([
+				[3, 6],
+				[3, 7],
+				[3, 8],
+				[3, 9],
+			]);
+		});
+
+		it("don't place a ship if there's another ship on its coordinate", () => {
+			const destroyer = new Ship('destroyer', 5);
+			const carrier = new Ship('carrier', 4);
+
+			expect(gb10.placeShip(destroyer, [1, 1], 0)).toStrictEqual(gb10.fleet);
+			expect(gb10.placeShip(carrier, [3, 6], 1)).toThrow(
+				"Can't place a ship over another one"
+			);
 		});
 	});
 });

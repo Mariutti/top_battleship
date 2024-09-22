@@ -11,12 +11,15 @@
  *
  * 5. Gameboards should be able to report whether or not all of their ships have been sunk.
  * */
+
 export default class GameBoard {
 	#size;
 	#board;
+	#fleet;
 	constructor(size) {
 		this.#size = size;
 		this.#board = this.createBoard();
+		this.#fleet = [];
 	}
 
 	get size() {
@@ -25,6 +28,10 @@ export default class GameBoard {
 
 	get board() {
 		return this.#board;
+	}
+
+	get fleet() {
+		return this.#fleet;
 	}
 
 	createBoard() {
@@ -38,13 +45,38 @@ export default class GameBoard {
 	}
 
 	placeShip(ship, initPosition, direction) {
-		const [x, y] = initPosition;
-		// 0 = horizontal
-		// 1 = vertical
+		const coordinatesToInclude = [];
+		const [xInit, yInit] = initPosition;
 		if (direction === 0) {
-			const shipStart = x;
-			const shipEnd = x + ship.length;
-			const yShip = y;
+			for (let i = xInit; i < xInit + ship.length; i++) {
+				let arr = [i, yInit];
+				this.compareArr(arr);
+				coordinatesToInclude.push(arr);
+			}
+		} else if (direction === 1) {
+			for (let i = yInit; i < yInit + ship.length; i++) {
+				let arr = [xInit, i];
+				this.compareArr(arr);
+				coordinatesToInclude.push(arr);
+			}
 		}
+
+		this.#fleet.push({ ship, coordinates: coordinatesToInclude });
+		return this.fleet;
+	}
+
+	compareArr(array1) {
+		this.fleet.forEach((ship) => {
+			ship.coordinates.forEach((coordArr) => {
+				if (
+					array1.length === coordArr.length &&
+					array1.every(function (value, index) {
+						return value === coordArr[index];
+					})
+				) {
+					throw new Error("Can't place a ship over another one");
+				}
+			});
+		});
 	}
 }
