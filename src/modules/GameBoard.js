@@ -23,6 +23,10 @@ export default class GameBoard {
 		return this.#size;
 	}
 
+	get board() {
+		return this.#board;
+	}
+
 	createBoard() {
 		let board = [];
 		for (let i = 0; i < this.size; i++) {
@@ -32,8 +36,15 @@ export default class GameBoard {
 		}
 		return board;
 	}
+
+	placeShip(ship, initPosition, direction) {
+		const [x, y] = initPosition;
+		// 0 = horizontal
+		// 1 = vertical
+		if (direction === 0) {
+			const shipStart = x;
+			const shipEnd = x + ship.length;
+			const yShip = y;
+		}
+	}
 }
-
-const gb = new GameBoard(3);
-
-console.log(gb.createBoard());

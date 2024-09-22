@@ -4,17 +4,17 @@ const common = require('./webpack.common.js');
 module.exports = merge(common, {
 	mode: 'development',
 	devtool: 'inline-source-map',
-    devServer: {
-        static: './dist',
-        watchFiles: ['./src/template.html'],
+	devServer: {
+		static: './dist',
+		watchFiles: ['./src/template.html'],
 		hot: true,
-    },
-    module: {
+	},
+	module: {
 		rules: [
-			{
-				test: /\.css$/i,
-				use: ['style-loader', 'css-loader'],
-			},
+			// {
+			// 	test: /\.css$/i,
+			// 	use: ['style-loader', 'css-loader'],
+			// },
 		],
 	},
 });

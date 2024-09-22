@@ -1,0 +1,31 @@
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.gameArea {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.boardDiv {
+	height: 500px;
+	max-width: 500px;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.boardTile {
+	height: 50px;
+	width: 50px;
+	background-color: darkblue;
+	border: 1px solid black;
+}
+
+.horizontalLine::before{
+	content: var(--lineNumber)
+}

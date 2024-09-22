@@ -18,12 +18,20 @@ export default class Ship {
 		this.#sunk = this.isSunk();
 	}
 
+	get shipType() {
+		return this.#shipType;
+	}
+
 	get length() {
 		return this.#length;
 	}
 
 	get hitSuffered() {
 		return this.#hitSuffered;
+	}
+
+	get sunk() {
+		return this.#sunk;
 	}
 
 	hit() {

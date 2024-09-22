@@ -1,4 +1,5 @@
-import GameBoard from '../modules/Gameboard.js';
+import GameBoard from '../modules/GameBoard.js';
+import Ship from '../modules/Ship.js';
 
 describe('GameBoard class', () => {
 	let gb3;
@@ -19,7 +20,6 @@ describe('GameBoard class', () => {
 		});
 
 		it('return the board 3x3', () => {
-			console.log(gb3.createBoard());
 			expect(gb3.createBoard()).toStrictEqual([
 				[0, 0],
 				[0, 1],
@@ -136,6 +136,17 @@ describe('GameBoard class', () => {
 				[9, 8],
 				[9, 9],
 			]);
+		});
+	});
+
+	describe('function placeShip', () => {
+		it('is defined', () => {
+			expect(gb3.placeShip).toBeDefined();
+		});
+
+		it('receive a ship and places at the board', () => {
+			const destroyer = new Ship('destroyer', 5);
+			expect(gb10.placeShip(destroyer, [2, 4], 0)).toStrictEqual();
 		});
 	});
 });
