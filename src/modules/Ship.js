@@ -8,13 +8,13 @@
 export default class Ship {
 	#shipType;
 	#length;
-	#hitSuffered = 0;
+	#hitSuffered;
 	#sunk;
 
 	constructor(shipType, length) {
 		this.#shipType = shipType;
 		this.#length = length;
-		// this.hitSuffered = 0;
+		this.#hitSuffered = 0;
 		this.#sunk = this.isSunk();
 	}
 

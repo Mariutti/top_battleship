@@ -146,8 +146,10 @@ describe('GameBoard class', () => {
 		it('receive a ship and places at the board horizontally, returning fleet coordinates on its ship', () => {
 			const destroyer = new Ship('destroyer', 5);
 			expect(gb10.fleet).toBeDefined();
-			expect(gb10.placeShip(destroyer, [1, 1], 0)).toStrictEqual(gb10.fleet);
-			expect(gb10.fleet[0].coordinates).toStrictEqual([
+			expect(gb10.placeShip(destroyer, [1, 1], 0)).toStrictEqual(
+				gb10.occupiedPositions
+			);
+			expect(gb10.occupiedPositions).toStrictEqual([
 				[1, 1],
 				[2, 1],
 				[3, 1],
@@ -158,8 +160,10 @@ describe('GameBoard class', () => {
 
 		it('receive a ship and places at the board vertically, returning fleet coordinates on its ship', () => {
 			const carrier = new Ship('carrier', 4);
-			expect(gb10.placeShip(carrier, [3, 6], 1)).toStrictEqual(gb10.fleet);
-			expect(gb10.fleet[0].coordinates).toStrictEqual([
+			expect(gb10.placeShip(carrier, [3, 6], 1)).toStrictEqual(
+				gb10.occupiedPositions
+			);
+			expect(gb10.occupiedPositions).toStrictEqual([
 				[3, 6],
 				[3, 7],
 				[3, 8],
@@ -171,10 +175,66 @@ describe('GameBoard class', () => {
 			const destroyer = new Ship('destroyer', 5);
 			const carrier = new Ship('carrier', 4);
 
-			expect(gb10.placeShip(destroyer, [1, 1], 0)).toStrictEqual(gb10.fleet);
-			expect(gb10.placeShip(carrier, [3, 6], 1)).toThrow(
-				"Can't place a ship over another one"
+			gb10.placeShip(destroyer, [1, 1], 0);
+			expect(gb10.placeShip(carrier, [1, 1], 1)).toStrictEqual(
+				gb10.occupiedPositions
 			);
+			expect(gb10.occupiedPositions).toStrictEqual([
+				[1, 1],
+				[2, 1],
+				[3, 1],
+				[4, 1],
+				[5, 1],
+			]);
+		});
+	});
+
+	describe('Function receiveAttack', () => {
+		beforeEach(() => {
+			const destroyer = new Ship('destroyer', 5);
+			const carrier = new Ship('carrier', 4);
+
+			gb10.placeShip(destroyer, [1, 1], 0);
+			gb10.placeShip(carrier, [4, 2], 1);
+		});
+		it('is defined', () => {
+			expect(gb10.receiveAttack).toBeDefined();
+		});
+
+		it('returns true if the attack hit a ship', () => {
+			expect(gb10.receiveAttack([4, 2])).toBeTruthy();
+		});
+
+		it('returns false if the attack miss a ship', () => {
+			expect(gb10.receiveAttack([6, 8])).toBeFalsy();
+		});
+
+		it("don't allow attack a place/coordinate already attacked", () => {
+			// dont' permit duplicated attacks
+		});
+
+		describe('missed attacks', () => {
+			it('is defined', () => {
+				expect(gb10.missedAttacks).toBeDefined();
+			});
+
+			it('record only missed attacks on the board', () => {
+				gb10.receiveAttack([6, 8]);
+				gb10.receiveAttack([1, 1]);
+				expect(gb10.missedAttacks).toStrictEqual([[6, 8]]);
+				gb10.receiveAttack([9, 9]);
+				expect(gb10.missedAttacks).toStrictEqual([
+					[6, 8],
+					[9, 9],
+				]);
+			});
+		});
+
+		describe('hits a ship and send a hit to the correct ship', () => {
+			it('change the hitSuffered propriety of the ship hit', () => {
+				expect(gb10.receiveAttack([4, 2])).toBeTruthy();
+				expect(gb10.fleet[1].ship.hitSuffered).toBe(1);
+			});
 		});
 	});
 });

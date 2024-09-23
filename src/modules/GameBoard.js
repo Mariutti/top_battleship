@@ -16,10 +16,15 @@ export default class GameBoard {
 	#size;
 	#board;
 	#fleet;
+	#occupiedPositions;
+	#missedAttacks;
+
 	constructor(size) {
 		this.#size = size;
 		this.#board = this.createBoard();
 		this.#fleet = [];
+		this.#occupiedPositions = [];
+		this.#missedAttacks = [];
 	}
 
 	get size() {
@@ -32,6 +37,14 @@ export default class GameBoard {
 
 	get fleet() {
 		return this.#fleet;
+	}
+
+	get occupiedPositions() {
+		return this.#occupiedPositions;
+	}
+
+	get missedAttacks() {
+		return this.#missedAttacks;
 	}
 
 	createBoard() {
@@ -50,33 +63,74 @@ export default class GameBoard {
 		if (direction === 0) {
 			for (let i = xInit; i < xInit + ship.length; i++) {
 				let arr = [i, yInit];
-				this.compareArr(arr);
+
+				let checkRepeatedPositions = false;
+				this.occupiedPositions.forEach((position) => {
+					if (this.compareArrays(position, arr)) {
+						checkRepeatedPositions = true;
+					}
+				});
+				if (checkRepeatedPositions) {
+					return this.occupiedPositions;
+				}
 				coordinatesToInclude.push(arr);
 			}
 		} else if (direction === 1) {
 			for (let i = yInit; i < yInit + ship.length; i++) {
 				let arr = [xInit, i];
-				this.compareArr(arr);
+				let checkRepeatedPositions = false;
+				this.occupiedPositions.forEach((position) => {
+					if (this.compareArrays(position, arr)) {
+						checkRepeatedPositions = true;
+					}
+				});
+				if (checkRepeatedPositions) {
+					return this.occupiedPositions;
+				}
 				coordinatesToInclude.push(arr);
 			}
 		}
 
+		this.#occupiedPositions = [
+			...this.occupiedPositions,
+			...coordinatesToInclude,
+		];
+
 		this.#fleet.push({ ship, coordinates: coordinatesToInclude });
-		return this.fleet;
+		return this.occupiedPositions;
 	}
 
-	compareArr(array1) {
-		this.fleet.forEach((ship) => {
-			ship.coordinates.forEach((coordArr) => {
-				if (
-					array1.length === coordArr.length &&
-					array1.every(function (value, index) {
-						return value === coordArr[index];
-					})
-				) {
-					throw new Error("Can't place a ship over another one");
-				}
-			});
+	// 3. Gameboards should have a `receiveAttack` function that takes a pair of coordinates, determines whether or not the attack hit a ship and then sends the ‘hit’ function to the correct ship, or records the coordinates of the missed shot.
+
+	receiveAttack(attackCoord) {
+		let hitted = false;
+		this.occupiedPositions.forEach((position) => {
+			if (this.compareArrays(position, attackCoord)) {
+				hitted = true;
+			}
 		});
+
+		if (hitted) {
+			let shipTohit;
+
+			this.fleet.forEach((shipConj) => {
+				shipConj.coordinates.forEach((coord) => {
+					if (this.compareArrays(coord, attackCoord)) {
+						shipTohit = shipConj.ship;
+					}
+				});
+			});
+
+			shipTohit.hit();
+		} else {
+			this.#missedAttacks.push(attackCoord);
+		}
+
+		return hitted;
+	}
+
+	// utils
+	compareArrays(a, b) {
+		return JSON.stringify(a) === JSON.stringify(b);
 	}
 }
