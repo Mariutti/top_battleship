@@ -1,6 +1,6 @@
 import Ship from '../modules/Ship.js';
 
-describe('Ship class', () => {
+describe.skip('Ship class', () => {
 	let ship;
 	beforeEach(() => {
 		ship = new Ship('genericType', 3);

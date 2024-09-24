@@ -17,6 +17,7 @@ export default class GameBoard {
 	#board;
 	#fleet;
 	#occupiedPositions;
+	#allAttacks;
 	#missedAttacks;
 
 	constructor(size) {
@@ -24,6 +25,7 @@ export default class GameBoard {
 		this.#board = this.createBoard();
 		this.#fleet = [];
 		this.#occupiedPositions = [];
+		this.#allAttacks = [];
 		this.#missedAttacks = [];
 	}
 
@@ -41,6 +43,10 @@ export default class GameBoard {
 
 	get occupiedPositions() {
 		return this.#occupiedPositions;
+	}
+
+	get allAttacks() {
+		return this.#allAttacks;
 	}
 
 	get missedAttacks() {
@@ -103,34 +109,62 @@ export default class GameBoard {
 	// 3. Gameboards should have a `receiveAttack` function that takes a pair of coordinates, determines whether or not the attack hit a ship and then sends the ‘hit’ function to the correct ship, or records the coordinates of the missed shot.
 
 	receiveAttack(attackCoord) {
-		let hitted = false;
-		this.occupiedPositions.forEach((position) => {
-			if (this.compareArrays(position, attackCoord)) {
-				hitted = true;
-			}
+		if (this.attackIsDuplicated(attackCoord)) {
+			return false;
+		}
+
+		let shipToHit;
+
+		this.fleet.forEach((shipConj) => {
+			shipConj.coordinates.forEach((coord) => {
+				if (this.compareArrays(coord, attackCoord)) {
+					shipToHit = shipConj.ship;
+				}
+			});
 		});
 
-		if (hitted) {
-			let shipTohit;
-
-			this.fleet.forEach((shipConj) => {
-				shipConj.coordinates.forEach((coord) => {
-					if (this.compareArrays(coord, attackCoord)) {
-						shipTohit = shipConj.ship;
-					}
-				});
-			});
-
-			shipTohit.hit();
+		if (shipToHit) {
+			shipToHit.hit();
 		} else {
 			this.#missedAttacks.push(attackCoord);
 		}
+		this.#allAttacks.push(attackCoord);
+		// }
+		return true;
+	}
 
-		return hitted;
+	//  * 5. Gameboards should be able to report whether or not all of their ships have been sunk.
+
+	areAllSunk() {
+		// TODO: do the logic magic to compare all the ships at the fleet and see if all of them are sunk
+		let sunkNum = 0;
+
+		this.fleet.forEach((shipConj) => {
+			if (shipConj.ship.isSunk()) {
+				sunkNum++;
+			}
+		});
+
+		if (sunkNum === this.fleet.length) {
+			return true;
+		}
+		return false;
 	}
 
 	// utils
 	compareArrays(a, b) {
 		return JSON.stringify(a) === JSON.stringify(b);
+	}
+
+	attackIsDuplicated(attackCoord) {
+		let duplicatedAttack = false;
+
+		this.allAttacks.forEach((coord) => {
+			if (this.compareArrays(attackCoord, coord)) {
+				duplicatedAttack = true;
+			}
+		});
+
+		return duplicatedAttack;
 	}
 }

@@ -206,35 +206,116 @@ describe('GameBoard class', () => {
 		});
 
 		it('returns false if the attack miss a ship', () => {
-			expect(gb10.receiveAttack([6, 8])).toBeFalsy();
+			expect(gb10.receiveAttack([6, 8])).toBeTruthy();
 		});
 
 		it("don't allow attack a place/coordinate already attacked", () => {
-			// dont' permit duplicated attacks
+			// don't permit duplicated attacks
+			gb10.receiveAttack([6, 8]);
+			gb10.receiveAttack([1, 1]);
+			gb10.receiveAttack([1, 1]);
+			expect(gb10.receiveAttack([6, 8])).toBeFalsy();
+			expect(gb10.allAttacks).toStrictEqual([
+				[6, 8],
+				[1, 1],
+			]);
+			gb10.receiveAttack([6, 3]);
+			expect(gb10.allAttacks).toStrictEqual([
+				[6, 8],
+				[1, 1],
+				[6, 3],
+			]);
+			gb10.receiveAttack([6, 3]);
+			expect(gb10.allAttacks).toStrictEqual([
+				[6, 8],
+				[1, 1],
+				[6, 3],
+			]);
+			gb10.receiveAttack([5, 3]);
+			expect(gb10.allAttacks).toStrictEqual([
+				[6, 8],
+				[1, 1],
+				[6, 3],
+				[5, 3],
+			]);
 		});
 
-		describe('missed attacks', () => {
-			it('is defined', () => {
-				expect(gb10.missedAttacks).toBeDefined();
-			});
+		it('change the hitSuffered propriety of the ship hit', () => {
+			expect(gb10.receiveAttack([4, 2])).toBeTruthy();
+			expect(gb10.fleet[1].ship.hitSuffered).toBe(1);
+			expect(gb10.receiveAttack([4, 3])).toBeTruthy();
+			expect(gb10.fleet[1].ship.hitSuffered).toBe(2);
+		});
+	});
 
-			it('record only missed attacks on the board', () => {
-				gb10.receiveAttack([6, 8]);
-				gb10.receiveAttack([1, 1]);
-				expect(gb10.missedAttacks).toStrictEqual([[6, 8]]);
-				gb10.receiveAttack([9, 9]);
-				expect(gb10.missedAttacks).toStrictEqual([
-					[6, 8],
-					[9, 9],
-				]);
-			});
+	describe('store/track missed attacks', () => {
+		it('property is defined', () => {
+			expect(gb10.missedAttacks).toBeDefined();
 		});
 
-		describe('hits a ship and send a hit to the correct ship', () => {
-			it('change the hitSuffered propriety of the ship hit', () => {
-				expect(gb10.receiveAttack([4, 2])).toBeTruthy();
-				expect(gb10.fleet[1].ship.hitSuffered).toBe(1);
-			});
+		it('record only the missed attacks on the board at its array', () => {
+			const destroyer = new Ship('destroyer', 5);
+			const carrier = new Ship('carrier', 4);
+
+			gb10.placeShip(destroyer, [1, 1], 0);
+			gb10.placeShip(carrier, [4, 2], 1);
+
+			gb10.receiveAttack([6, 8]);
+			gb10.receiveAttack([1, 1]);
+			expect(gb10.missedAttacks).toStrictEqual([[6, 8]]);
+			gb10.receiveAttack([9, 9]);
+			expect(gb10.missedAttacks).toStrictEqual([
+				[6, 8],
+				[9, 9],
+			]);
+		});
+	});
+
+	//  * 5. Gameboards should be able to report whether or not all of their ships have been sunk.
+	describe('report whether or not all of their ships have been sunk', () => {
+		beforeEach(() => {
+			const destroyer = new Ship('destroyer', 5);
+			const carrier = new Ship('carrier', 4);
+
+			gb10.placeShip(destroyer, [1, 1], 0);
+			gb10.placeShip(carrier, [4, 2], 1);
+		});
+
+		it('method allSunk() is defined', () => {
+			expect(gb10.areAllSunk).toBeDefined();
+		});
+
+		it('method allSunk() return false if ships sunk are less than ship of the fleet', () => {
+			expect(gb10.areAllSunk()).toBeFalsy();
+			gb10.receiveAttack([1, 1]);
+			expect(gb10.areAllSunk()).toBeFalsy();
+			gb10.receiveAttack([2, 1]);
+			gb10.receiveAttack([3, 1]);
+			gb10.receiveAttack([4, 1]);
+			gb10.receiveAttack([5, 1]);
+			gb10.receiveAttack([4, 2]);
+			gb10.receiveAttack([4, 3]);
+
+			expect(gb10.fleet[0].ship.isSunk()).toBeTruthy();
+			expect(gb10.fleet[1].ship.isSunk()).toBeFalsy();
+		});
+
+		it('method allSunk() return true if number of ships sunk are equal number of ship of the fleet', () => {
+			expect(gb10.areAllSunk()).toBeFalsy();
+			gb10.receiveAttack([1, 1]);
+			expect(gb10.areAllSunk()).toBeFalsy();
+			gb10.receiveAttack([2, 1]);
+			gb10.receiveAttack([3, 1]);
+			gb10.receiveAttack([4, 1]);
+			gb10.receiveAttack([5, 1]);
+			gb10.receiveAttack([4, 2]);
+			gb10.receiveAttack([4, 3]);
+			gb10.receiveAttack([4, 4]);
+			gb10.receiveAttack([4, 5]);
+
+			expect(gb10.fleet[0].ship.isSunk()).toBeTruthy();
+			expect(gb10.fleet[1].ship.isSunk()).toBeTruthy();
+			expect(gb10.areAllSunk()).toBeTruthy();
 		});
 	});
 });
