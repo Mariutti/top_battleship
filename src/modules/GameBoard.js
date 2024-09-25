@@ -66,7 +66,13 @@ export default class GameBoard {
 	placeShip(ship, initPosition, direction) {
 		const coordinatesToInclude = [];
 		const [xInit, yInit] = initPosition;
+		if (xInit < 0 || yInit < 0) {
+			return this.occupiedPositions;
+		}
 		if (direction === 0) {
+			if(xInit + ship.length > this.size){
+				return this.occupiedPositions;
+			}
 			for (let i = xInit; i < xInit + ship.length; i++) {
 				let arr = [i, yInit];
 
@@ -82,6 +88,9 @@ export default class GameBoard {
 				coordinatesToInclude.push(arr);
 			}
 		} else if (direction === 1) {
+			if(yInit + ship.length > this.size){
+				return this.occupiedPositions;
+			}
 			for (let i = yInit; i < yInit + ship.length; i++) {
 				let arr = [xInit, i];
 				let checkRepeatedPositions = false;

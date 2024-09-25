@@ -1,6 +1,6 @@
 import Ship from '../modules/Ship.js';
 
-describe.skip('Ship class', () => {
+describe('Ship class', () => {
 	let ship;
 	beforeEach(() => {
 		ship = new Ship('genericType', 3);
@@ -10,7 +10,7 @@ describe.skip('Ship class', () => {
 		expect(ship).toBeDefined();
 	});
 
-	it('object is instance of class', () => {
+	it('object is instance of class Ship', () => {
 		expect(ship).toBeInstanceOf(Ship);
 	});
 

@@ -13,6 +13,10 @@ describe('GameBoard class', () => {
 		expect(gb3).toBeDefined();
 	});
 
+	it('object is instance of class Gameboard', () => {
+		expect(gb3).toBeInstanceOf(GameBoard);
+	});
+
 	describe('function createBoard()', () => {
 		it('is defined', () => {
 			expect(gb3.createBoard).toBeDefined();
@@ -139,12 +143,17 @@ describe('GameBoard class', () => {
 	});
 
 	describe('function placeShip', () => {
+		let destroyer;
+		let carrier;
+		beforeEach(() => {
+			destroyer = new Ship('destroyer', 5);
+			carrier = new Ship('carrier', 4);
+		});
 		it('is defined', () => {
 			expect(gb3.placeShip).toBeDefined();
 		});
 
 		it('receive a ship and places at the board horizontally, returning fleet coordinates on its ship', () => {
-			const destroyer = new Ship('destroyer', 5);
 			expect(gb10.fleet).toBeDefined();
 			expect(gb10.placeShip(destroyer, [1, 1], 0)).toStrictEqual(
 				gb10.occupiedPositions
@@ -159,7 +168,6 @@ describe('GameBoard class', () => {
 		});
 
 		it('receive a ship and places at the board vertically, returning fleet coordinates on its ship', () => {
-			const carrier = new Ship('carrier', 4);
 			expect(gb10.placeShip(carrier, [3, 6], 1)).toStrictEqual(
 				gb10.occupiedPositions
 			);
@@ -172,9 +180,24 @@ describe('GameBoard class', () => {
 		});
 
 		it("don't place a ship if there's another ship on its coordinate", () => {
-			const destroyer = new Ship('destroyer', 5);
-			const carrier = new Ship('carrier', 4);
+			gb10.placeShip(destroyer, [1, 1], 0);
+			expect(gb10.placeShip(carrier, [1, 1], 1)).toStrictEqual(
+				gb10.occupiedPositions
+			);
+			expect(gb10.occupiedPositions).toStrictEqual([
+				[1, 1],
+				[2, 1],
+				[3, 1],
+				[4, 1],
+				[5, 1],
+			]);
+		});
 
+		it("don't place a ship out of the board", () => {
+			gb10.placeShip(destroyer, [8, 1], 0);
+			gb10.placeShip(destroyer, [-2, 1], 0);
+			gb10.placeShip(destroyer, [8, 9], 1);
+			expect(gb10.occupiedPositions).toStrictEqual([]);
 			gb10.placeShip(destroyer, [1, 1], 0);
 			expect(gb10.placeShip(carrier, [1, 1], 1)).toStrictEqual(
 				gb10.occupiedPositions
@@ -285,7 +308,7 @@ describe('GameBoard class', () => {
 			expect(gb10.areAllSunk).toBeDefined();
 		});
 
-		it('method allSunk() return false if ships sunk are less than ship of the fleet', () => {
+		it('method allSunk() return false if ships sunk are less than ships of the fleet', () => {
 			expect(gb10.areAllSunk()).toBeFalsy();
 			gb10.receiveAttack([1, 1]);
 			expect(gb10.areAllSunk()).toBeFalsy();
@@ -300,7 +323,7 @@ describe('GameBoard class', () => {
 			expect(gb10.fleet[1].ship.isSunk()).toBeFalsy();
 		});
 
-		it('method allSunk() return true if number of ships sunk are equal number of ship of the fleet', () => {
+		it('method allSunk() return true if number of ships sunk are equal number of ships of the fleet', () => {
 			expect(gb10.areAllSunk()).toBeFalsy();
 			gb10.receiveAttack([1, 1]);
 			expect(gb10.areAllSunk()).toBeFalsy();
