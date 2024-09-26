@@ -1,7 +1,7 @@
 import GameBoard from '../modules/GameBoard.js';
 import Player from '../modules/Player.js';
 
-describe.skip('Player class', () => {
+describe('Player class', () => {
 	let p1;
 	beforeEach(() => {
 		p1 = new Player();

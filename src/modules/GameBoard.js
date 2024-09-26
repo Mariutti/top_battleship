@@ -70,7 +70,7 @@ export default class GameBoard {
 			return this.occupiedPositions;
 		}
 		if (direction === 0) {
-			if(xInit + ship.length > this.size){
+			if (xInit + ship.length > this.size) {
 				return this.occupiedPositions;
 			}
 			for (let i = xInit; i < xInit + ship.length; i++) {
@@ -88,7 +88,7 @@ export default class GameBoard {
 				coordinatesToInclude.push(arr);
 			}
 		} else if (direction === 1) {
-			if(yInit + ship.length > this.size){
+			if (yInit + ship.length > this.size) {
 				return this.occupiedPositions;
 			}
 			for (let i = yInit; i < yInit + ship.length; i++) {
@@ -145,7 +145,6 @@ export default class GameBoard {
 	//  * 5. Gameboards should be able to report whether or not all of their ships have been sunk.
 
 	areAllSunk() {
-		// TODO: do the logic magic to compare all the ships at the fleet and see if all of them are sunk
 		let sunkNum = 0;
 
 		this.fleet.forEach((shipConj) => {
